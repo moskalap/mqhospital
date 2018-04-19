@@ -1,7 +1,5 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 import com.rabbitmq.client.*;
@@ -11,14 +9,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.RandomStringUtils;
 
 public class Doctor extends MedicalStaff {
-    public static int doctorsCnt = 1;
     private static int EXAMINATION_CNT = 40;
     private List<Pair<String, ExaminationType>> examinations;
-    public Doctor() throws IOException {
-        this.staffId = Integer.toString(doctorsCnt++);
+    public Doctor(String doctorId) throws IOException {
+        this.staffId = doctorId;
         this.examinations = generateExaminations(EXAMINATION_CNT);
     }
 
@@ -44,7 +40,7 @@ public class Doctor extends MedicalStaff {
     }
 
     private void examinePatients() throws InterruptedException, IOException, TimeoutException {
-        Channel channel = createOwnChannel();
+        Channel channel = createChannel();
         //rownowazenie obciazenia techników
         channel.basicQos(1);
         channel.exchangeDeclare(Constans.TECHNICAN_EXCHANGE, BuiltinExchangeType.TOPIC);
@@ -53,7 +49,7 @@ public class Doctor extends MedicalStaff {
             Thread.sleep((long)(Math.random() * 10000));
             //KEY - EXAMINATION TYPE
             channel.basicPublish(Constans.TECHNICAN_EXCHANGE, patient.getRight().name(), null, generateMsg(staffId,patient.getLeft(), patient.getRight()));
-            logger.info(String.format("[doctor: %s] sent request for examintation (%s, %s)", staffId, patient.getRight().name(), patient.getLeft()));
+            logger.info(String.format("[doctor: %s] sent request for examintation \t(%s, %s)", staffId, patient.getRight().name(), patient.getLeft()));
         }
     }
 
@@ -67,7 +63,7 @@ public class Doctor extends MedicalStaff {
     }
 
     private void listenTechnicans() throws IOException, TimeoutException {
-        Channel channel = createOwnChannel();
+        Channel channel = createChannel();
 
         //topic exchange
         channel.exchangeDeclare(Constans.DOCTOR_EXCHANGE, BuiltinExchangeType.TOPIC);
@@ -84,15 +80,22 @@ public class Doctor extends MedicalStaff {
                 String patientName = msg[1];
                 String exam = msg[2];
 
-                logger.info(String.format("\t\t\t[doctor: %s] got examination (%s, %s) from technican %s", staffId, patientName, exam, tech));
+                logger.info(String.format("\t\t\t[doctor: %s] got examination\t (%s, %s) \tfrom technican %s", staffId, patientName, exam, tech));
             }
         });
 
     }
 
     public static void main(String[] args) throws InterruptedException, TimeoutException, IOException {
-        Doctor doctor = new Doctor();
-        doctor.work();
+                    Thread.sleep(5000);
+
+                    Doctor doctor = null;
+                    doctor = new Doctor("Y");
+                    doctor.work();
+
+
+
+
     }
 
 

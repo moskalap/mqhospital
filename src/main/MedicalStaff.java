@@ -6,14 +6,18 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import static main.Constans.ADMIN_EXCHANGE;
+
 public class MedicalStaff extends SystemUser {
+
+
     protected String staffId;
-    protected static Logger logger = Logger.getLogger(MedicalStaff.class.getName());
-    protected static final String ADMIN_EXCHANGE = "ADMIN_EXCHANGE";
+
+
 
     public void listenToAdmin() throws IOException, TimeoutException {
         //create a channel to listen admin messages
-        Channel channel = createOwnChannel();
+        Channel channel = createChannel();
 
         // exchange - fanout - all will be receivers
         channel.exchangeDeclare(ADMIN_EXCHANGE, BuiltinExchangeType.FANOUT);
@@ -24,7 +28,8 @@ public class MedicalStaff extends SystemUser {
                     @Override
                     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                         String message = new String(body, "UTF-8");
-                        logger.info(String.format("ADMIN: %s", message));
+                        logger.info(String.format("" +
+                                "\t\t---ADMIN: %s", message));
                     }
                 }
         );
