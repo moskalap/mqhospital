@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.TimeoutException;
 
 public class Admin extends SystemUser {
-    public Admin(){
+    public Admin() {
 
     }
 
@@ -18,8 +18,8 @@ public class Admin extends SystemUser {
     }
 
     private void publishToAll() {
-        new Thread(){
-            public void run(){
+        new Thread() {
+            public void run() {
 
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -29,12 +29,12 @@ public class Admin extends SystemUser {
 
                     boolean run = true;
 
-                    while(run){
+                    while (run) {
                         String msg = br.readLine();
-                        if(msg.equals("-q")){
+                        if (msg.equals("-q")) {
                             run = false;
-                        }else{
-                            ch.basicPublish(Constans.ADMIN_EXCHANGE,"", null, msg.getBytes());
+                        } else {
+                            ch.basicPublish(Constans.ADMIN_EXCHANGE, "", null, msg.getBytes());
                         }
                     }
 
@@ -71,6 +71,7 @@ public class Admin extends SystemUser {
             }
         });
     }
+
     public static void main(String[] args) throws IOException, TimeoutException {
         Admin a = new Admin();
         a.work();

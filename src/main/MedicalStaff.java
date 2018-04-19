@@ -14,7 +14,6 @@ public class MedicalStaff extends SystemUser {
     protected String staffId;
 
 
-
     public void listenToAdmin() throws IOException, TimeoutException {
         //create a channel to listen admin messages
         Channel channel = createChannel();

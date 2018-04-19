@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 public class Doctor extends MedicalStaff {
     private static int EXAMINATION_CNT = 40;
     private List<Pair<String, ExaminationType>> examinations;
+
     public Doctor(String doctorId) throws IOException {
         this.staffId = doctorId;
         this.examinations = generateExaminations(EXAMINATION_CNT);
@@ -20,14 +22,14 @@ public class Doctor extends MedicalStaff {
 
     private List<Pair<String, ExaminationType>> generateExaminations(int examinationCnt) throws IOException {
         List<Pair<String, ExaminationType>> examinations = new ArrayList<>(EXAMINATION_CNT);
-            for (int i = 0; i < examinationCnt; i++){
-                int surnameIndex = new Random().nextInt(Constans.names.length);
-                int x = new Random().nextInt(ExaminationType.class.getEnumConstants().length);
-                ExaminationType type = ExaminationType.class.getEnumConstants()[x];
-                examinations.add(Pair.of(Constans.names[surnameIndex], type));
-            }
+        for (int i = 0; i < examinationCnt; i++) {
+            int surnameIndex = new Random().nextInt(Constans.names.length);
+            int x = new Random().nextInt(ExaminationType.class.getEnumConstants().length);
+            ExaminationType type = ExaminationType.class.getEnumConstants()[x];
+            examinations.add(Pair.of(Constans.names[surnameIndex], type));
+        }
 
-            return examinations;
+        return examinations;
 
 
     }
@@ -45,10 +47,10 @@ public class Doctor extends MedicalStaff {
         channel.basicQos(1);
         channel.exchangeDeclare(Constans.TECHNICAN_EXCHANGE, BuiltinExchangeType.TOPIC);
 
-        for(Pair<String, ExaminationType> patient: examinations){
-            Thread.sleep((long)(Math.random() * 10000));
+        for (Pair<String, ExaminationType> patient : examinations) {
+            Thread.sleep((long) (Math.random() * 10000));
             //KEY - EXAMINATION TYPE
-            channel.basicPublish(Constans.TECHNICAN_EXCHANGE, patient.getRight().name(), null, generateMsg(staffId,patient.getLeft(), patient.getRight()));
+            channel.basicPublish(Constans.TECHNICAN_EXCHANGE, patient.getRight().name(), null, generateMsg(staffId, patient.getLeft(), patient.getRight()));
             logger.info(String.format("[doctor: %s] sent request for examintation \t(%s, %s)", staffId, patient.getRight().name(), patient.getLeft()));
         }
     }
@@ -71,7 +73,7 @@ public class Doctor extends MedicalStaff {
         String queueName = channel.queueDeclare().getQueue();
         //topic by doctor id
         channel.queueBind(queueName, Constans.DOCTOR_EXCHANGE, staffId);
-        channel.basicConsume(queueName, false, new DefaultConsumer(channel){
+        channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 String message = new String(body, "UTF-8");
@@ -87,17 +89,14 @@ public class Doctor extends MedicalStaff {
     }
 
     public static void main(String[] args) throws InterruptedException, TimeoutException, IOException {
-                    Thread.sleep(5000);
+        Thread.sleep(5000);
 
-                    Doctor doctor = null;
-                    doctor = new Doctor("Y");
-                    doctor.work();
-
-
+        Doctor doctor = null;
+        doctor = new Doctor("y");
+        doctor.work();
 
 
     }
-
 
 
 }

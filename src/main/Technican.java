@@ -22,7 +22,7 @@ public class Technican extends MedicalStaff {
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
 
-                Technican technican = new Technican(ExaminationType.ELBOW, ExaminationType.HIP);
+                Technican technican = new Technican(ExaminationType.ELBOW, ExaminationType.KNEE);
                 technican.work();
 
     }
